@@ -1,0 +1,9 @@
+[
+    {
+      "id": 1,
+      "title": "Базовые фразы",
+      "exercises": [
+        { "type": "translate", "question": "Hello", "answer": "Привет" }
+      ]
+    }
+  ]

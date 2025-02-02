@@ -1,21 +1,29 @@
-import { initTelegram } from './telegram.js';
+import { initTelegram, getTelegramUser } from './telegram.js';
 import { saveProgress, loadProgress } from './storage.js';
+import db from './database.js';
+import { renderLesson } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Инициализация Telegram
-  const user = initTelegram();
-  
-  // Загрузка прогресса
+  // Получаем пользователя Telegram
+  const user = getTelegramUser();
+
+  // Сохраняем пользователя в IndexedDB (если его ещё нет)
+  await db.users.put({ tgId: user.id, username: user.username });
+
+  // Загружаем прогресс
   const progress = await loadProgress();
-  renderLessons(progress);
+
+  // Загружаем уроки из IndexedDB
+  const lessons = await db.lessons.toArray();
+
+  // Рендер уроков, объединяя данные о прогрессе
+  renderLessons(lessons, progress);
 });
 
-function renderLessons(progress) {
+function renderLessons(lessons, progress) {
   const container = document.getElementById('lessons');
-  // Пример: отрисовка уроков
-  container.innerHTML = progress.map(lesson => `
-    <div class="lesson-item">
-      Урок ${lesson.lessonId}: ${lesson.score} баллов
-    </div>
-  `).join('');
+  container.innerHTML = lessons.map(lesson => {
+    const progressData = progress.find(p => p.lessonId === lesson.id) || { score: 0 };
+    return renderLesson({ ...lesson, score: progressData.score });
+  }).join('');
 }
