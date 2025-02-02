@@ -1,0 +1,24 @@
+{
+  "name": "tontutor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trxtr337/TONTutor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trxtr337/TONTutor/issues"
+  },
+  "homepage": "https://github.com/trxtr337/TONTutor#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "live-server": "^1.2.2"
+  }
+}
