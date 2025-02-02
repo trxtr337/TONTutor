@@ -1,29 +1,38 @@
-import { initTelegram, getTelegramUser } from './telegram.js';
-import { saveProgress, loadProgress } from './storage.js';
+import { initTelegram } from './telegram.js';
+import { initUser, saveLessonProgress, loadLessons } from './storage.js';
+import { renderLessons, updateProgress } from './ui.js';
 import db from './database.js';
-import { renderLesson } from './ui.js';
 
+// Инициализация приложения
 document.addEventListener('DOMContentLoaded', async () => {
-  // Получаем пользователя Telegram
-  const user = getTelegramUser();
+  try {
+    // 1. Подключение к Telegram
+    const { user, theme } = initTelegram();
+    document.getElementById('username').textContent = user.first_name;
+    
+    // 2. Инициализация пользователя в БД
+    await initUser(user);
 
-  // Сохраняем пользователя в IndexedDB (если его ещё нет)
-  await db.users.put({ tgId: user.id, username: user.username });
+    // 3. Загрузка уроков
+    const lessons = await loadLessons();
+    renderLessons(lessons);
 
-  // Загружаем прогресс
-  const progress = await loadProgress();
+    // 4. Обновление прогресса
+    const totalScore = lessons.reduce((acc, lesson) => acc + lesson.score, 0);
+    const averageProgress = (totalScore / (lessons.length * 100)) * 100;
+    updateProgress(averageProgress);
 
-  // Загружаем уроки из IndexedDB
-  const lessons = await db.lessons.toArray();
+    // 5. Обработчики событий
+    document.querySelectorAll('.start-lesson').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const lessonId = e.target.closest('.lesson-card').dataset.lessonId;
+        await saveLessonProgress(lessonId, 10); // Пример: +10% за урок
+        window.location.reload(); // Обновить интерфейс
+      });
+    });
 
-  // Рендер уроков, объединяя данные о прогрессе
-  renderLessons(lessons, progress);
+  } catch (error) {
+    console.error('Ошибка инициализации:', error);
+    Telegram.WebApp.showAlert('Произошла ошибка. Пожалуйста, перезагрузите приложение.');
+  }
 });
-
-function renderLessons(lessons, progress) {
-  const container = document.getElementById('lessons');
-  container.innerHTML = lessons.map(lesson => {
-    const progressData = progress.find(p => p.lessonId === lesson.id) || { score: 0 };
-    return renderLesson({ ...lesson, score: progressData.score });
-  }).join('');
-}
