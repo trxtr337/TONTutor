@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главное меню</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Добро пожаловать в TonTutor</h1>
+        <button onclick="startLearning()">📖 Начать изучение</button>
+    </div>
+
+    <script>
+        function startLearning() {
+            window.location.href = "index.html"; // Переход к изучению слов
+        }
+
+        // Разворачиваем приложение на весь экран в Telegram
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.expand();
+        }
+    </script>
+</body>
+</html>

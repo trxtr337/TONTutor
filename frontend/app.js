@@ -3,12 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const translationElement = document.getElementById("translation");
 
   function fetchWord() {
-      fetch("http://localhost:3000/word") // Если сервер локально, используй localhost
+      fetch("http://localhost:3000/word") // Замени на свой сервер при деплое
           .then(response => response.json())
           .then(data => {
               wordElement.textContent = data.word;
               translationElement.textContent = data.translation;
               translationElement.style.display = "none"; // Прячем перевод
+              console.log("Получено слово:", data.word); // Проверка
           })
           .catch(error => console.error("Ошибка загрузки слова:", error));
   }
@@ -17,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
       translationElement.style.display = "block"; // Показываем перевод
   };
 
+  window.fetchWord = fetchWord; // Делаем функцию доступной в HTML
+
   fetchWord(); // Загружаем слово при запуске страницы
-  console.log("app.js загружен!");
 });
